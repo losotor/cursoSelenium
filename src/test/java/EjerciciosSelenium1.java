@@ -1,8 +1,11 @@
 import com.google.common.annotations.VisibleForTesting;
+import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.Select;
 
+import java.awt.print.Printable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -171,6 +174,123 @@ public class EjerciciosSelenium1 {
         driver.findElement(By.name("login")).click();
     }
 
+    @Test
+    public void forgotAccountTest() {
 
+        WebDriver driver = getDriver("https://www.facebook.com");
+        driver.manage().window().maximize();
+
+        String titulo = driver.getTitle();
+        Assert.assertEquals("*** titulo no coincide ***", "Facebook - Inicia sesión o regístrate", titulo);
+
+        driver.findElement(By.linkText("¿Olvidaste tu contraseña?")).click();
+        String titulo2 = driver.getTitle();
+        Assert.assertEquals("*** el titulo no es correcto", "¿Olvidaste tu contraseña? | No puedo iniciar sesión | Facebook",titulo2);
+        Assert.assertNotEquals("*** Se encuentra en la URL incorrecta ***", driver.getCurrentUrl(), "https://www.facebook.com/");
+
+        driver.close();
+    }
+
+    @Test
+    public void forgotAccountPartialLinkTest() {
+        WebDriver driver = getDriver("https://www.facebook.com");
+        driver.manage().window().maximize();
+
+        driver.findElement(By.partialLinkText("¿Olvidaste")).click();
+        driver.close();
+    }
+
+    @Test
+    public void checkBoxAndComboboxTest() throws InterruptedException {
+        WebDriver driver = getDriver("https://www.facebook.com");
+        driver.manage().window().maximize();
+
+        driver.findElement(By.linkText("Crear cuenta nueva")).click();
+        Thread.sleep(5000);
+        driver.findElement(By.name("firstname")).sendKeys("Alan");
+        driver.findElement(By.name("lastname")).sendKeys("Smith");
+        driver.findElement(By.xpath("//label[contains(text(), 'Personalizado')]")).click();
+
+        WebElement dias = driver.findElement(By.id("day"));
+        Select comboboxDias = new Select(dias);
+        comboboxDias.selectByValue("4");
+
+        WebElement meses = driver.findElement(By.id("month"));
+        Select comboboxMeses = new Select(meses);
+        comboboxMeses.selectByVisibleText("abr");
+
+        WebElement años = driver.findElement(By.id("year"));
+        Select comboboxAños = new Select(años);
+        comboboxAños.selectByIndex(9);
+
+        Thread.sleep(3000);
+        driver.close();
+    }
+
+    @Test
+    public void comboboxTest() throws InterruptedException {
+        WebDriver driver = getDriver("https://www.facebook.com");
+        driver.manage().window().maximize();
+
+        Thread.sleep(3000);
+        driver.findElement(By.linkText("Crear cuenta nueva")).click();
+        Thread.sleep(5000);
+
+        WebElement meses = driver.findElement(By.id("month"));
+        Select combo = new Select(meses);
+
+        List<WebElement> options = combo.getOptions();
+        Assert.assertNotEquals(0, options.size());
+
+        boolean encontrar = false;
+
+        for(WebElement opt: options){
+            System.out.println(opt.getText());
+            if (opt.getText().contentEquals("jun")) {
+                encontrar = true;
+                break;
+            }
+        }
+    }
+
+    @Test
+    public void completeRegistration() throws InterruptedException {
+        WebDriver driver = getDriver("https://www.facebook.com");
+        driver.manage().window().maximize();
+
+        Thread.sleep(3000);
+        driver.findElement(By.linkText("Crear cuenta nueva")).click();
+        Thread.sleep(5000);
+
+        driver.findElement(By.name("firstname")).sendKeys("The");
+        driver.findElement(By.name("lastname")).sendKeys("Smith");
+        driver.findElement(By.name("reg_email__")).sendKeys("12341234");
+        driver.findElement(By.name("reg_passwd__")).sendKeys("12341234");
+
+        setBirthdate(driver, "22", "jun", "1990");
+
+    }
+
+    private void setBirthdate(WebDriver driver, String day, String month, String year) {
+
+        WebElement dias = driver.findElement(By.name("birthday_day"));
+        Select comboDias = new Select(dias);
+        comboDias.selectByVisibleText(day);
+
+        WebElement meses = driver.findElement(By.name("birthday_month"));
+        Select comboMeses = new Select(meses);
+        comboMeses.selectByVisibleText(month);
+
+        WebElement año = driver.findElement(By.name("birthday_year"));
+        Select comboAño = new Select(año);
+        comboAño.selectByVisibleText(year);
+
+    }
+
+    
 
 }
+
+
+
+
